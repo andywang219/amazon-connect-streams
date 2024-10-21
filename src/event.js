@@ -24,6 +24,7 @@
     'close',
     'configure',
     'log',
+    'download_log_from_ccp',
     'master_request',
     'master_response',
     'synchronize',
@@ -87,7 +88,8 @@
     'acw',
     'mute_toggle',
     'local_media_stream_created',
-    'enqueued_next_state'
+    'enqueued_next_state',
+    'fetch_agent_data_from_ccp'
   ]);
 
   /**---------------------------------------------------------------
@@ -123,7 +125,10 @@
     'view',
     'ended',
     'error',
-    'accepted'
+    'accepted',
+    'screen_sharing_started',
+    'screen_sharing_stopped',
+    'screen_sharing_error'
   ]);
 
   var ChannelViewEvents = connect.makeNamespacedEnum('taskList', [
@@ -133,7 +138,7 @@
   var TaskEvents = connect.makeNamespacedEnum('task', [
       'created'
   ]);
-
+  
   /**---------------------------------------------------------------
   * enum ConnectionEvents
   */
@@ -157,9 +162,9 @@
     'background_blur_changed'
   ]);
 
-  /**---------------------------------------------------------------
-   * enum Disaster Recovery Events
-   */
+   /**---------------------------------------------------------------
+    * enum Disaster Recovery Events
+    */
   var DisasterRecoveryEvents = connect.makeNamespacedEnum('disasterRecovery', [
     'suppress',
     'force_offline', // letting the sharedworker know to force offline

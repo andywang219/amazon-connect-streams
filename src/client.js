@@ -88,10 +88,21 @@
    /**---------------------------------------------------------------
     * enum ApiProxyClientMethods
     */
-   connect.ApiProxyClientMethods = connect.makeEnum([
-      'qrIntegrationExists',
-      'qrSearchQuickResponses',
-   ]);
+   connect.ApiProxyClientMethods = {
+      QR_INTEGRATION_EXISTS: 'qrIntegrationExists',
+      QR_SEARCH_QUICK_RESPONSES: 'qrSearchQuickResponses',
+      BATCH_GET_ATTACHED_FILE_METADATA: 'batchGetAttachedFileMetadata',
+      START_ATTACHED_FILE_UPLOAD: 'startAttachedFileUpload',
+      COMPLETE_ATTACHED_FILE_UPLOAD: 'completeAttachedFileUpload',
+      GET_ATTACHED_FILE: 'getAttachedFile',
+      DELETE_ATTACHED_FILE: 'deleteAttachedFile',
+      CREATE_OUTBOUND_EMAIL_CONTACT: 'createOutboundEmailContact',
+      START_OUTBOUND_EMAIL_CONTACT: 'startOutboundEmailContact',
+      LIST_CONTACT_REFERENCES: "listContactReferences",
+      DESCRIBE_CONTACT: "describeContact",
+      LIST_ASSOCIATED_CONTACTS: "listAssociatedContacts",
+      START_SCREEN_SHARING: "startScreenSharing",
+    },
 
    /**---------------------------------------------------------------
     * client methods that are retryable

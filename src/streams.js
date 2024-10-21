@@ -228,6 +228,18 @@
 
       this.upstream.onMessage(connect.hitch(this, this._dispatchEvent, this.upstreamBus));
       this.downstream.onMessage(connect.hitch(this, this._dispatchEvent, this.downstreamBus));
+
+      // Only relevant for Global Resiliency
+      this.active = true;
+      this.allowedEvents =
+      [
+         connect.EventType.CONFIGURE,
+         connect.EventType.SYNCHRONIZE,
+         connect.EventType.ACKNOWLEDGE,
+         connect.EventType.LOG,
+         connect.EventType.SERVER_BOUND_INTERNAL_LOG,
+         connect.EventType.DOWNLOAD_LOG_FROM_CCP
+      ];
    };
 
    Conduit.prototype.onUpstream = function(eventName, f) {
