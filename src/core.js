@@ -12,7 +12,7 @@
   connect.core = {};
   connect.globalResiliency = connect.globalResiliency || {};
   connect.core.initialized = false;
-  connect.version = "STREAMS_VERSION";
+  connect.version = process.env.npm_package_version;
   connect.outerContextStreamsVersion = null;
   connect.DEFAULT_BATCH_SIZE = 500;
 
@@ -1314,6 +1314,46 @@ connect.core.setSoftphoneUserMediaStream = function (stream) {
     connect.assertNotNull(containerDiv, 'containerDiv');
     connect.assertNotNull(params.ccpUrl, 'params.ccpUrl');
 
+
+    // Add SDK via AmazonConnectStreamsSite
+    if (!paramsIn.provider) {
+      try {
+        const { AmazonConnectStreamsSite } = require("@amazon-connect/site-streams");
+
+        var instanceUrl = new URL(params.ccpUrl).origin;
+        var config = { instanceUrl };
+        connect.core._amazonConnectProviderData = {
+          ...AmazonConnectStreamsSite.init(config),
+          isStreamsProvider: true
+        };
+        connect.getLog().info("Created AmazonConnectStreamsSite")
+          .withObject({providerId: connect.core._amazonConnectProviderData.provider.id})
+          .sendInternalLogToServer();
+      } catch(e) {
+        connect.getLog().error("Error when setting up AmazonConnectStreamsSite")
+          .withException(e)
+          .sendInternalLogToServer();
+      }
+    } else {
+      try {
+        connect.core._amazonConnectProviderData = {
+          provider: paramsIn.provider,
+          isStreamsProvider: false,
+        };
+
+        connect.getLog().info("Using AmazonConnectProvider from params")
+          .withObject({
+            providerId: connect.core._amazonConnectProviderData.provider.id,
+            providerType: connect.core._amazonConnectProviderData.provider.constructor.name,
+          })
+          .sendInternalLogToServer();
+      } catch(e) {
+        connect.getLog().error("Error when setting up AmazonConnectProvider from params")
+          .withException(e)
+          .sendInternalLogToServer();
+      }
+    }
+
     connect.core.iframeStyle = params.style || "width: 100%; height: 100%;";
 
     // Clean up the Softphone and Ringtone params store to make sure we always pull the latest params
@@ -1703,6 +1743,18 @@ connect.core.setSoftphoneUserMediaStream = function (stream) {
       iframe.src = connect.storageAccess.getRequestStorageAccessUrl();
       iframe.addEventListener('load', connect.storageAccess.request);
     }
+
+    // When provider is Streams provider, sets iframe for verification when configuring Message Channel
+    if (connect.core._amazonConnectProviderData?.isStreamsProvider) {
+      try {
+        connect.core._amazonConnectProviderData.provider.setCCPIframe(iframe);
+      } catch (error) {
+        connect.getLog().error("Error occurred when setting CCP iframe to provider")
+          .withException(error)
+          .sendInternalLogToServer();
+      }
+    }
+
     containerDiv.appendChild(iframe);
     return iframe;
   }
@@ -1729,6 +1781,14 @@ connect.core.setSoftphoneUserMediaStream = function (stream) {
       };
       conduit.sendUpstream(connect.EventType.IFRAME_STYLE, data);
     }, 10000);
+  }
+
+  connect.core.getSDKClientConfig = function () {
+    if (!connect.core._amazonConnectProviderData) {
+      throw new Error("Provider is not initialized")
+    }
+
+    return {provider: connect.core._amazonConnectProviderData?.provider}; 
   }
 
   /**-----------------------------------------------------------------------*/

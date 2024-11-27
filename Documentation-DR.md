@@ -1,4 +1,6 @@
-# Global Resiliency/Disaster Recovery Streams
+# Global Resiliency/Disaster Recovery Streams - DEPRECATED AS OF VERSION 2.16.0
+
+** Please refer to [Documentation-GR.md](Documentation-GR.md) for new ACGR documentation **
 
 **In order to obtain access to the Global Resiliency feature, you will need to reach out to your Amazon Connect Solutions Architect or Technical Account Manager first.**
 
@@ -194,10 +196,9 @@ Integrates with Connect by loading the pre-built CCPs located at `ccpUrl` and `s
     * `enableVideoDeviceSettings`: If `true`, the settings tab will display a section for configuring video input devices for the agent's local machine. If `false`, or if `pageOptions` is not provided, the agent will not be able to change video device settings from the settings tab.
     * `enablePhoneTypeSettings`: If `true`, or if `pageOptions` is not provided, the settings tab will display a section for configuring the agent's phone type and deskphone number. If `false`, the agent will not be able to change the phone type or deskphone number from the settings tab.
 * `shouldAddNamespaceToLogs`: prepends `[CCP]` to all logs logged by the CCP. Important note: there are a few logs made by the CCP before the namespace is prepended.
-* `ccpAckTimeout`: A timeout in ms that tells CCP how long it should wait for an `ACKNOWLEDGE` message from the shared worker after CCP has sent a `SYNCHRONIZE` message to the shared worker. This is important because an `ACKNOWLEDGE` message is only sent back to CCP if the shared worker is initialized and a shared worker is only initialized if the agent is logged in. Moreover, this check happens continuously.
-* `ccpSynTimeout`: A timeout in ms that tells CCP how long to wait before sending another `SYNCHRONIZE` message to the shared worker, which should trigger the shared worker to send back an `ACKNOWLEDGE` if initialized. This event essentially checks if the shared worker was initialized aka agent is logged in. This check happens continuously as well.
-* `ccpLoadTimeout`: A timeout in ms that tells CCP how long to wait before sending the very first `SYNCHRONIZE` message. The user experience here is that on the first CCP initialization, the login flow is delayed by this timeout.
-  * As an example, if this timeout was set to 10 seconds, then the login pop-up will not open up until 10 seconds has pass.
+* `ccpAckTimeout`: A timeout in ms that indicates how long streams will wait for the iframed CCP to respond to its `SYNCHRONIZE` event emissions. These happen continuously from the first time `initCCP` is called. They should only appear when there is a problem that requires a refresh or a re-login.
+* `ccpSynTimeout`: A timeout in ms that indicates how long streams will wait to send a new `SYNCHRONIZE` event to the iframed CCP. These happens continuously from the first time `initCCP` is called.
+* `ccpLoadTimeout`: A timeout in ms that indicates how long streams will wait for the initial `ACKNOWLEDGE` event from the shared worker while the CCP is still standing itself up.
 
 #### A few things to note:
 
